@@ -3,6 +3,7 @@
 #include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/CreatorLayer.hpp>
 #include <Geode/ui/TextInput.hpp>
+#include <Geode/ui/Popup.hpp>
 
 using namespace geode::prelude;
 
@@ -29,7 +30,7 @@ void saveCurrentRun(PlayLayer* playLayer) {
     run.isPlatformer = level->isPlatformer();
     
     if (run.isPlatformer) {
-        run.time = playLayer->m_time;
+        run.time = playLayer->m_gameState.m_levelTime;
         run.percentage = 0.0f;
     } else {
         run.percentage = playLayer->getCurrentPercent();
@@ -39,7 +40,7 @@ void saveCurrentRun(PlayLayer* playLayer) {
     auto mod = Mod::get();
     auto savedRuns = mod->getSavedValue<std::vector<matjson::Value>>("saved_runs");
 
-    matjson::Value runJson;
+    matjson::Value runJson = matjson::Object();
     runJson["levelName"] = run.levelName;
     runJson["creatorName"] = run.creatorName;
     runJson["levelID"] = run.levelID;
@@ -54,7 +55,7 @@ void saveCurrentRun(PlayLayer* playLayer) {
 }
 
 // 1. Popup de Confirmation / Details de la Run (Triangle Bleu et Triangle Jaune)
-class RunDetailsPopup : public Popup<SavedRun const&> {
+class RunDetailsPopup : public geode::Popup<SavedRun const&> {
 protected:
     SavedRun m_runData;
 
@@ -121,11 +122,11 @@ protected:
 
     // Disclaimer Bouton Bleu
     void onBluePlay(CCObject*) {
-        createQuickPopup(
+        geode::createQuickPopup(
             "Warning",
             "By starting the level, you will return to your last checkpoint.",
             "Back", "Play",
-            [this](FLAlertLayer*, bool btn2) {
+            [](FLAlertLayer*, bool btn2) {
                 if (btn2) {
                     log::info("Lancement du niveau au dernier checkpoint !");
                 }
@@ -135,11 +136,11 @@ protected:
 
     // Disclaimer Bouton Jaune
     void onYellowPlay(CCObject*) {
-        createQuickPopup(
+        geode::createQuickPopup(
             "Warning",
             "By starting the level, you will spawn directly where you stopped.",
             "Back", "Play",
-            [this](FLAlertLayer*, bool btn2) {
+            [](FLAlertLayer*, bool btn2) {
                 if (btn2) {
                     log::info("Lancement du niveau a la position exacte !");
                 }
@@ -160,7 +161,7 @@ public:
 };
 
 // 2. Interface Popup de la Page de Recherche "PS"
-class PSSearchPopup : public Popup<std::string const&> {
+class PSSearchPopup : public geode::Popup<std::string const&> {
 protected:
     TextInput* m_searchInput = nullptr;
 
@@ -214,7 +215,6 @@ protected:
     }
 
     void onSearch(CCObject*) {
-        // Test d'ouverture de la carte du niveau
         SavedRun testRun;
         testRun.levelName = "Stereo Madness";
         testRun.creatorName = "RobTop";
