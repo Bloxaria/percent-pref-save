@@ -40,7 +40,7 @@ void saveCurrentRun(PlayLayer* playLayer) {
     auto mod = Mod::get();
     auto savedRuns = mod->getSavedValue<std::vector<matjson::Value>>("saved_runs");
 
-    matjson::Value runJson = matjson::Object();
+    matjson::Value runJson;
     runJson["levelName"] = run.levelName;
     runJson["creatorName"] = run.creatorName;
     runJson["levelID"] = run.levelID;
@@ -54,8 +54,8 @@ void saveCurrentRun(PlayLayer* playLayer) {
     log::info("Run enregistree pour {} par {}", run.levelName, run.creatorName);
 }
 
-// 1. Popup de Confirmation / Details de la Run (Triangle Bleu et Triangle Jaune)
-class RunDetailsPopup : public geode::Popup<SavedRun const&> {
+// 1. Popup de Details de la Run
+class RunDetailsPopup : public Popup<SavedRun const&> {
 protected:
     SavedRun m_runData;
 
@@ -65,7 +65,6 @@ protected:
 
         auto winSize = CCDirector::sharedDirector()->getWinSize();
 
-        // Formatage du texte (Pourcentage ou Temps)
         std::string infoText = "";
         if (m_runData.isPlatformer) {
             int totalSec = static_cast<int>(m_runData.time);
@@ -77,9 +76,9 @@ protected:
             infoText = fmt::format("{:.1f}%", m_runData.percentage);
         }
 
-        // --- Bouton Bleu (Triangle / Resume Checkpoint) ---
+        // --- Bouton Bleu ---
         auto blueSpr = CCSprite::createWithSpriteFrameName("GJ_playBtn2_001.png");
-        blueSpr->setColor({ 0, 180, 255 }); // Teinte bleue
+        blueSpr->setColor({ 0, 180, 255 });
         blueSpr->setScale(0.8f);
 
         auto blueBtn = CCMenuItemSpriteExtra::create(
@@ -92,7 +91,7 @@ protected:
         blueLabel->setScale(0.4f);
         blueLabel->setPosition({ winSize.width / 2.0f - 60.0f, winSize.height / 2.0f - 40.0f });
 
-        // --- Bouton Jaune (Triangle / Resume Exact Position) ---
+        // --- Bouton Jaune ---
         auto yellowSpr = CCSprite::createWithSpriteFrameName("GJ_playBtn2_001.png");
         yellowSpr->setScale(0.8f);
 
@@ -106,7 +105,6 @@ protected:
         yellowLabel->setScale(0.4f);
         yellowLabel->setPosition({ winSize.width / 2.0f + 60.0f, winSize.height / 2.0f - 40.0f });
 
-        // Menu pour aligner les deux boutons
         auto playMenu = CCMenu::create();
         playMenu->setPosition({ winSize.width / 2.0f, winSize.height / 2.0f + 10.0f });
         playMenu->addChild(blueBtn);
@@ -120,7 +118,6 @@ protected:
         return true;
     }
 
-    // Disclaimer Bouton Bleu
     void onBluePlay(CCObject*) {
         geode::createQuickPopup(
             "Warning",
@@ -134,7 +131,6 @@ protected:
         );
     }
 
-    // Disclaimer Bouton Jaune
     void onYellowPlay(CCObject*) {
         geode::createQuickPopup(
             "Warning",
@@ -160,8 +156,8 @@ public:
     }
 };
 
-// 2. Interface Popup de la Page de Recherche "PS"
-class PSSearchPopup : public geode::Popup<std::string const&> {
+// 2. Interface Popup de Recherche "PS"
+class PSSearchPopup : public Popup<std::string const&> {
 protected:
     TextInput* m_searchInput = nullptr;
 
@@ -170,12 +166,10 @@ protected:
 
         auto winSize = CCDirector::sharedDirector()->getWinSize();
 
-        // Barre de recherche
         m_searchInput = TextInput::create(220.0f, "Enter level or user...");
         m_searchInput->setPosition({ winSize.width / 2.0f - 20.0f, winSize.height / 2.0f + 80.0f });
         m_mainLayer->addChild(m_searchInput);
 
-        // Loupe
         auto searchSpr = CCSprite::createWithSpriteFrameName("GJ_searchBtn_001.png");
         searchSpr->setScale(0.7f);
         auto searchBtn = CCMenuItemSpriteExtra::create(
@@ -184,7 +178,6 @@ protected:
             menu_selector(PSSearchPopup::onSearch)
         );
 
-        // Croix
         auto clearSpr = CCSprite::createWithSpriteFrameName("GJ_deleteIcon_001.png");
         clearSpr->setScale(0.7f);
         auto clearBtn = CCMenuItemSpriteExtra::create(
@@ -193,7 +186,6 @@ protected:
             menu_selector(PSSearchPopup::onClearInput)
         );
 
-        // Profil
         auto userSpr = CCSprite::createWithSpriteFrameName("GJ_friendsBtn_001.png");
         userSpr->setScale(0.6f);
         auto userBtn = CCMenuItemSpriteExtra::create(
