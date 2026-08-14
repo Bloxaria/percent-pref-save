@@ -1,0 +1,17 @@
+{
+	"geode": "5.9.0",
+	"gd": {
+		"win": "2.2081",
+		"android": "2.2081",
+		"mac": "2.2081",
+		"ios": "2.2081"
+	},
+	"id": "hxnaksoo.percent-pref&save",
+	"name": "percent pref&save",
+	"version": "v1.0.0",
+	"developer": "hxnaksoo",
+	"description": "Automatically adjusts settings for better gameplay comfort and saves Practice & Platformer progress.",
+	"dependencies": {
+		"geode.node-ids": ">=v1.23.3"
+	}
+}
